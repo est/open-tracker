@@ -1,14 +1,11 @@
 #!/usr/bin/python2.4
-#
-# Copyright 2007 Google Inc. All Rights Reserved.
 
 """One-line documentation for helloworld module.
 
 A detailed description of helloworld.
 """
 
-__author__ = 'aporter@google.com (Allen Porter)'
-
+__author__ = 'allen@thebends.org (Allen Porter)'
 
 import os
 import base64
@@ -18,6 +15,7 @@ from google.appengine.ext import webapp
 from google.appengine.ext import db
 
 import model
+import util
 from BTL import bencode
 
 class MainPage(webapp.RequestHandler):
@@ -26,7 +24,7 @@ class MainPage(webapp.RequestHandler):
 
   def get(self):
     self.response.headers['Content-Type'] = 'text/plain'
-    info_hash = self.request.get('info_hash')
+    info_hash = util.GetParam('info_hash')
     if len(info_hash) == 20:
       torrents = model.Torrent.gql("WHERE info_hash = :1",
                                 base64.b64encode(info_hash))
@@ -49,5 +47,5 @@ application = webapp.WSGIApplication(
     [ ( '/scrape', MainPage ) ],
     debug=True)
 
-os.environ['CONTENT_TYPE'] = "%s;charset=utf8" % os.environ['CONTENT_TYPE']
+#os.environ['CONTENT_TYPE'] = "%s;charset=utf8" % os.environ['CONTENT_TYPE']
 wsgiref.handlers.CGIHandler().run(application)
