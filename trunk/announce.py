@@ -13,12 +13,14 @@ import base64
 import datetime
 import os
 import wsgiref.handlers
+import cgi
 
 from google.appengine.ext import db
 from google.appengine.ext import webapp
 from BTL import bencode
 
 import model
+import util
 
 def compact_peer_info(ip, port):
   try:
@@ -36,7 +38,7 @@ class MainPage(webapp.RequestHandler):
     self._peers = [ ]
 
   def get(self):
-    info_hash = self.request.get('info_hash')
+    info_hash = util.GetParam('info_hash')
     if len(info_hash) != 20:
       self.error("Invalid info_hash argument (%d != 20)" % (len(info_hash)))
       return
@@ -156,5 +158,5 @@ application = webapp.WSGIApplication(
     debug=True)
 
 # Hack so that we don't try to parse the info_hash as a UTF-8 string
-os.environ['CONTENT_TYPE'] = "%s;charset=" % os.environ['CONTENT_TYPE']
+#os.environ['CONTENT_TYPE'] = "%s;charset=" % os.environ['CONTENT_TYPE']
 wsgiref.handlers.CGIHandler().run(application)

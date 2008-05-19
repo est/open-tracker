@@ -7,7 +7,7 @@
 A detailed description of helloworld.
 """
 
-__author__ = 'aporter@google.com (Allen Porter)'
+__author__ = 'allen@thebends.org (Allen Porter)'
 
 import base64
 import datetime
@@ -40,5 +40,5 @@ application = webapp.WSGIApplication(
     debug=True)
 
 # Hack so that we don't try to parse the info_hash as a UTF-8 string
-os.environ['CONTENT_TYPE'] = "%s;charset=" % os.environ['CONTENT_TYPE']
+#os.environ['CONTENT_TYPE'] = "%s;charset=" % os.environ['CONTENT_TYPE']
 wsgiref.handlers.CGIHandler().run(application)
