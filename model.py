@@ -1,13 +1,9 @@
 #!/usr/bin/python2.4
-#
-# Copyright 2008 Google Inc. All Rights Reserved.
 
-"""One-line documentation for peer module.
-
-A detailed description of peer.
+"""Data model.
 """
 
-__author__ = 'aporter@google.com (Allen Porter)'
+__author__ = 'allen@thebends.org (Allen Porter)'
 
 import base64
 from google.appengine.ext import db
