@@ -1,6 +1,4 @@
 #!/usr/bin/python2.4
-#
-# Copyright 2007 Google Inc. All Rights Reserved.
 
 """One-line documentation for helloworld module.
 

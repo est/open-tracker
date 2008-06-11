@@ -1,13 +1,9 @@
 #!/usr/bin/python2.4
-#
-# Copyright 2007 Google Inc. All Rights Reserved.
 
-"""One-line documentation for helloworld module.
-
-A detailed description of helloworld.
+"""Announce module
 """
 
-__author__ = 'aporter@google.com (Allen Porter)'
+__author__ = 'allen@thebends.org (Allen Porter)'
 
 import base64
 import datetime
