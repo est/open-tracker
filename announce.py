@@ -31,7 +31,7 @@ def compact_peer_info(ip, port):
 class MainPage(webapp.RequestHandler):
   def __init__(self):
     self._compact = False
-    self._peers = [ ]
+    self._peers = None
 
   def get(self):
     info_hash = util.GetParam('info_hash')
@@ -136,18 +136,18 @@ class MainPage(webapp.RequestHandler):
 
   def BuildPeersResult(self, torrent):
     peers = model.TorrentPeerEntry.gql("WHERE torrent = :1", torrent)
-    for peer_entry in peers:
-      self._peers.append(self.GetPeerInfo(peer_entry))
-
-  def GetPeerInfo(self, peer_entry):
     if not self._compact:
-      return {
-          "peer id" : str(peer_entry.peer_id),
-          "ip" : str(peer_entry.ip),
-          "port" : peer_entry.port,
-        }
+      self._peers = [ ]
+      for peer_entry in peers:
+        self._peers.append({
+              "peer id" : str(peer_entry.peer_id),
+              "ip" : str(peer_entry.ip),
+              "port" : peer_entry.port,
+          }
     else:
-      return compact_peer_info(peer_entry.ip, peer_entry.port)
+      self._peers = ""
+      for peer_entry in peers:
+        self._peers += compact_peer_info(peer_entry.ip, peer_entry.port)
 
 application = webapp.WSGIApplication(
     [ ( '/announce', MainPage ) ],
