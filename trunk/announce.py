@@ -143,7 +143,7 @@ class MainPage(webapp.RequestHandler):
               "peer id" : str(peer_entry.peer_id),
               "ip" : str(peer_entry.ip),
               "port" : peer_entry.port,
-          }
+          })
     else:
       self._peers = ""
       for peer_entry in peers:
