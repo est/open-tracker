@@ -1,4 +1,4 @@
-#!/usr/bin/python2.4
+#i!/usr/bin/python2.4
 
 """Announce module
 """
@@ -10,6 +10,7 @@ import datetime
 import os
 import wsgiref.handlers
 import cgi
+import logging
 
 from google.appengine.ext import db
 from google.appengine.ext import webapp
@@ -115,7 +116,8 @@ class MainPage(webapp.RequestHandler):
     peer.uploaded = uploaded
     peer.put()
 
-    self.BuildPeersResult(torrent)
+    self.BuildPeersResult(torrent, peer_id)
+    self.CleanupOldPeers(torrent)
 
     # TOOD(aporter): Respect maximum number of peers
     num_complete = 1
@@ -134,20 +136,36 @@ class MainPage(webapp.RequestHandler):
     self.response.headers['Content-Type'] = 'text/plain'
     self.response.out.write(bencode.bencode({ "failure reason" : msg }))
 
-  def BuildPeersResult(self, torrent):
-    peers = model.TorrentPeerEntry.gql("WHERE torrent = :1", torrent)
+  def BuildPeersResult(self, torrent, current_peer_id):
+    cutoff_time = datetime.datetime.now() - datetime.timedelta(minutes = 3)
+    peers = model.TorrentPeerEntry.gql("WHERE torrent = :1 AND " +
+                                       "last_datetime >= :2",
+                                       torrent, cutoff_time)
     if not self._compact:
       self._peers = [ ]
       for peer_entry in peers:
-        self._peers.append({
+        if peer_entry.peer_id != current_peer_id:
+          self._peers.append({
               "peer id" : str(peer_entry.peer_id),
               "ip" : str(peer_entry.ip),
               "port" : peer_entry.port,
-          })
+            })
     else:
       self._peers = ""
       for peer_entry in peers:
-        self._peers += compact_peer_info(peer_entry.ip, peer_entry.port)
+        if peer_entry.peer_id != current_peer_id:
+          self._peers += compact_peer_info(peer_entry.ip, peer_entry.port)
+
+  def CleanupOldPeers(self, torrent):
+    cutoff_time = datetime.datetime.now() - datetime.timedelta(minutes = 10)
+    query = db.GqlQuery("SELECT * FROM TorrentPeerEntry " +
+                        "WHERE last_datetime < :1",
+                        cutoff_time)
+    results = query.fetch(10)  # Do some small cleanup
+    if results:
+      logging.info("Deleting %d torrent peer entries" % len(results))
+      for result in results:
+        result.delete()
 
 application = webapp.WSGIApplication(
     [ ( '/announce', MainPage ) ],
